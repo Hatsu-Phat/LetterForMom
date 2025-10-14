@@ -1,0 +1,351 @@
+/* Cài đặt chung */
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Playfair Display', serif;
+    background-color: #fce4ec; /* Màu hồng nhạt fallback */
+}
+
+/* Nền của trang web */
+.background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('background.jpg'); /* THAY TÊN FILE BACKGROUND CỦA BẠN */
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
+}
+
+/* Khung bao bọc phong bì */
+.envelope-wrapper {
+    perspective: 1000px;
+    position: relative; /* QUAN TRỌNG: Để cánh có thể định vị tương đối với wrapper */
+    /* width và height có thể bỏ đi, để nó tự co giãn theo nội dung */
+}
+
+/* Phong bì chính */
+.envelope {
+    position: relative;
+    width: 320px;
+    height: 200px;
+    cursor: pointer;
+    transition: transform 0.3s ease-in-out;
+    z-index: 2;
+    background-color: transparent; /* Đảm bảo không có màu nền mặc định */
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    border: 3px solid #ff7b92; /* Viền ngoài đậm hơn */
+    box-sizing: border-box;
+}
+
+/* Hiệu ứng khi hover vào phong bì */
+.envelope:hover {
+    transform: translateY(-15px) scale(1.02);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3);
+}
+
+/* Phần thân chính của phong bì (màu hồng) */
+.envelope::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #ffb8c5; /* Màu hồng nhạt cho thân phong bì */
+    border-radius: 10px;
+    z-index: 0; /* Đặt ở lớp thấp nhất */
+}
+
+/* Nắp dưới của phong bì */
+.flap.bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%; /* Nửa dưới của phong bì */
+    background-color: #ffb8c5; /* Màu hồng nhạt giống thân */
+    border-radius: 0 0 10px 10px;
+    z-index: 1; /* Nằm trên thân phong bì */
+    transform-origin: top;
+}
+
+/* Nắp trên của phong bì (phần sọc chéo) */
+.flap.top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%; /* Chiếm toàn bộ chiều cao để tạo hình dạng tam giác */
+    background-color: #ffc0cb; /* Màu hồng nhạt hơn cho sọc */
+    background-image: linear-gradient(45deg, rgba(255,255,255,0.4) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0.4) 75%, transparent 75%, transparent);
+    background-size: 25px 25px; /* Kích thước sọc lớn hơn chút */
+    border-radius: 10px;
+    z-index: 3; /* Nằm trên thẻ và nắp dưới */
+    transform-origin: top center;
+    transition: transform 0.6s ease-in-out;
+    box-sizing: border-box;
+    clip-path: polygon(0% 0%, 100% 0%, 50% 55%); /* Tạo hình tam giác cho nắp */
+}
+
+/* Trái tim lớn ở giữa nắp trên */
+.heart-seal-top {
+    position: absolute;
+    top: 55%; 
+    left: 50%;
+    transform: translate(-50%, -50%); 
+    width: 60px; /* Kích thước to hơn */
+    height: 50px;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23e91e63"><path d="M12 21.35l-1.84-1.84C6.5 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-4.5 6.86-8.16 10.96L12 21.35z"/></svg>') no-repeat center center / contain;
+    filter: drop-shadow(0 3px 5px rgba(0,0,0,0.3)); /* Bóng đổ rõ hơn */
+    z-index: 4; /* Đặt trái tim trên tất cả các flap */
+    transition: transform 0.6s ease-in-out;
+}
+
+/* Thẻ giả định bên trong phong bì */
+.card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 90%;
+    background-color: transparent; /* Đặt trong suốt để thấy màu nền của envelope::before */
+    z-index: 2; /* Nằm trên thân phong bì nhưng dưới nắp trên */
+    transition: transform 0.6s ease-in-out;
+}
+
+/* --- Trạng thái khi phong bì được MỞ --- */
+.envelope.open .flap.top {
+    transform: rotateX(180deg);
+    z-index: 2; 
+}
+
+.envelope.open .heart-seal-top {
+    opacity: 0;
+    transform: translateX(-50%) translateY(10px);
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+}
+
+.envelope.open .card {
+    transform: translate(-50%, -60%); 
+}
+
+/* ==========================================================================
+    ĐÔI CÁNH THIÊN THẦN
+    ========================================================================== */
+.angel-wing {
+    position: absolute;
+    width: 100px; /* Điều chỉnh kích thước cánh phù hợp */
+    height: auto; /* Giữ tỷ lệ khung hình */
+    z-index: 1; /* Nằm dưới phong bì nhưng trên background */
+    filter: drop-shadow(0 2px 5px rgba(0,0,0,0.2)); /* Thêm bóng nhẹ cho cánh */
+    animation: flap 2s infinite ease-in-out alternate; /* Hiệu ứng đập cánh */
+}
+
+.left-wing {
+    top: 50%; /* Căn giữa theo chiều dọc của envelope-wrapper */
+    left: 25%; /* Căn giữa theo chiều ngang của envelope-wrapper */
+    transform: translate(-100%, -50%) translateX(-60px); /* Dịch sang trái và lùi ra sau phong bì */
+    /* Điều chỉnh translateX(-60px) để thay đổi khoảng cách từ phong bì */
+    animation-delay: 0s; /* Không có độ trễ ban đầu */
+}
+
+.right-wing {
+    top: 50%;
+    left: 75%;
+    transform: translate(0%, -50%) translateX(60px); /* Dịch sang phải và lùi ra sau phong bì */
+    /* Điều chỉnh translateX(60px) để thay đổi khoảng cách từ phong bì */
+    animation-delay: 0.2s; /* Trễ một chút để tạo hiệu ứng không đồng bộ */
+}
+
+/* Keyframes cho hiệu ứng đập cánh nhẹ nhàng */
+@keyframes flap {
+    0% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-5px) rotate(2deg); } /* Dịch lên 5px và xoay nhẹ */
+    100% { transform: translateY(0px) rotate(0deg); }
+}
+
+/* Các biến thể riêng cho cánh trái và cánh phải để tạo hiệu ứng "mềm" hơn */
+.left-wing {
+    animation: flap-left 2s infinite ease-in-out alternate;
+}
+
+.right-wing {
+    animation: flap-right 2s infinite ease-in-out alternate;
+}
+
+@keyframes flap-left {
+    0% { transform: translate(-100%, -50%) translateX(-60px) translateY(0px) rotate(0deg); }
+    50% { transform: translate(-100%, -50%) translateX(-60px) translateY(-8px) rotate(-3deg); } /* Dịch lên và xoay nhẹ ra ngoài */
+    100% { transform: translate(-100%, -50%) translateX(-60px) translateY(0px) rotate(0deg); }
+}
+
+@keyframes flap-right {
+    0% { transform: translate(0%, -50%) translateX(60px) translateY(0px) rotate(0deg); }
+    50% { transform: translate(0%, -50%) translateX(60px) translateY(-8px) rotate(3deg); } /* Dịch lên và xoay nhẹ ra ngoài */
+    100% { transform: translate(0%, -50%) translateX(60px) translateY(0px) rotate(0deg); }
+}
+
+
+/* ==========================================================================
+    POP-UP LÁ THƯ MỚI - GIỮ NGUYÊN HOẶC CHỈNH SỬA NHỎ
+    ========================================================================== */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 200, 220, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+.popup-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.popup-content {
+    background-color: #ffe6f0;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 15px 50px rgba(255, 100, 150, 0.6), 0 0 20px rgba(255, 255, 255, 0.8) inset;
+    width: 85%;
+    max-width: 550px;
+    position: relative;
+    transform: scale(0.7);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.popup-overlay.active .popup-content {
+    transform: scale(1);
+}
+
+.letter-border {
+    border: 3px dashed #ff80ab;
+    padding: 25px;
+    border-radius: 10px;
+    background-color: #fffafb;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) inset;
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 2.5em;
+    font-weight: normal;
+    color: #ff80ab;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease-in-out;
+}
+
+.close-button:hover {
+    transform: rotate(90deg);
+}
+
+.letter-content {
+    text-align: center;
+    color: #444;
+    line-height: 1.8;
+    font-size: 1.15em;
+    padding: 10px;
+}
+
+.letter-content .greeting {
+    font-family: 'Dancing Script', cursive;
+    font-size: 2.2em;
+    color: #e91e63;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+}
+
+.letter-content p {
+    margin-bottom: 1em;
+}
+
+.letter-content .signature {
+    text-align: right;
+    margin-top: 30px;
+    font-family: 'Dancing Script', cursive;
+    font-size: 1.8em;
+    color: #a05252;
+}
+
+/* Responsive cho điện thoại */
+@media (max-width: 600px) {
+    .background {
+        background-repeat: no-repeat; /* Không lặp lại ảnh */
+        background-position:-250px -10px; /* Căn giữa ảnh */
+        /* Nếu dùng contain, bạn có thể muốn thêm màu nền cho khoảng trống */
+        background-color: #fce4ec; 
+    }
+    .envelope {
+        width: 260px;
+        height: 170px;
+        border: 2px solid #ff7b92;
+    }
+    .heart-seal-top {
+        width: 50px;
+        height: 40px;
+        top: 55%; 
+    }
+    .heart-lock-bottom {
+        bottom: 20px;
+        width: 30px;
+        height: 25px;
+    }
+    .popup-content {
+        width: 65%;
+        padding: 20px;
+    }
+    .letter-border {
+        padding: 0px;
+    }
+    .letter-content .greeting {
+        font-size: 1.8em;
+    }
+    .letter-content p {
+        font-size: 0.8em;
+    }
+    .letter-content .signature {
+        font-size: 1.5em;
+    }
+    .close-button {
+        font-size: 3em;
+        top: 15px;
+        right: 20px;
+    }
+    .left-wing {
+        top: 50%; /* Căn giữa theo chiều dọc của envelope-wrapper */
+        left: 30%; /* Căn giữa theo chiều ngang của envelope-wrapper */
+        transform: translate(-100%, -50%) translateX(-60px); /* Dịch sang trái và lùi ra sau phong bì */
+        /* Điều chỉnh translateX(-60px) để thay đổi khoảng cách từ phong bì */
+        animation-delay: 0s; /* Không có độ trễ ban đầu */
+    }
+
+    .right-wing {
+        top: 50%;
+        left: 70%;
+        transform: translate(0%, -50%) translateX(60px); /* Dịch sang phải và lùi ra sau phong bì */
+        /* Điều chỉnh translateX(60px) để thay đổi khoảng cách từ phong bì */
+        animation-delay: 0.2s; /* Trễ một chút để tạo hiệu ứng không đồng bộ */
+    }
+}
